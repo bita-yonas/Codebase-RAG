@@ -1,4 +1,3 @@
-
 import streamlit as st
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone
@@ -6,7 +5,7 @@ import os
 from git import Repo
 import shutil
 from pathlib import Path
-from openai import OpenAI
+import openai
 from dotenv import load_dotenv  # Import dotenv for loading .env
 
 # Load environment variables from .env file
@@ -65,14 +64,8 @@ pc = Pinecone(
     environment="us-east-1"  # Specify the correct Pinecone environment
 )
 
-# Set Groq API key from environment variable
-os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
-
-# Initialize OpenAI (via Groq)
-client = OpenAI(
-    base_url="https://api.groq.com/openai/v1",
-    api_key=os.getenv("GROQ_API_KEY")
-)
+# Set OpenAI API key from environment variable
+openai.api_key = os.getenv("GROQ_API_KEY")
 
 # Function to get Hugging Face embeddings
 def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet-base-v2"):
@@ -112,15 +105,15 @@ def perform_rag(query, namespace):
     )
 
 
-    llm_response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+    llm_response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # specify the model you want to use
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": augmented_query},
         ],
     )
 
-    return llm_response.choices[0].message.content
+    return llm_response['choices'][0]['message']['content']
 
 # Streamlit UI
 st.title("Codebase Chat Assistant")
@@ -136,7 +129,7 @@ index = pc.Index("codebase-rag")
 preindexed_codebases = index.describe_index_stats().get("namespaces", {})
 
 # User selects between pre-indexed or new repository
-option = st.radio("Choose how you want to interact:", 
+option = st.radio("Choose how you want to interact:",
                   ["Provide a new GitHub repository", "Select a pre-indexed codebase"])
 
 # Handle namespace reset and chat clearing
