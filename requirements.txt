@@ -4,7 +4,7 @@ pinecone-client==5.0.1
 openai==0.28.0
 GitPython==3.1.32
 python-dotenv==1.0.1
-torch==2.4.1
+torch==2.5.1
 torchvision==0.20.1
 huggingface-hub==0.14.1
 tokenizers==0.13.3
