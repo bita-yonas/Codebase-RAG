@@ -102,7 +102,7 @@ def perform_rag(query, namespace):
 
     # Make the API call to the correct Groq chat endpoint
     llm_response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # specify the model you want to use
+        model="llama-3.2-3b-preview",  # specify the model you want to use
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": augmented_query},
