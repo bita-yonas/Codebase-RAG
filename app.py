@@ -129,12 +129,19 @@ def reset_chat(namespace):
         st.session_state.namespace = namespace
         st.session_state.messages = []  # Clear chat history
 
+# Fetch pre-indexed namespaces dynamically from Pinecone
+index = pc.Index("codebase-rag")
+preindexed_codebases = index.describe_index_stats().get("namespaces", {})
+
 # Handle pre-indexed codebase selection
 if option == "Select a pre-indexed codebase":
-    selected_codebase = st.selectbox("Select a codebase:", list(preindexed_codebases.keys()))
-    if selected_codebase:
-        reset_chat(selected_codebase)
-        st.success(f"Selected codebase: {selected_codebase}")
+    if preindexed_codebases:
+        selected_codebase = st.selectbox("Select a codebase:", list(preindexed_codebases.keys()))
+        if selected_codebase:
+            reset_chat(selected_codebase)
+            st.success(f"Selected codebase: {selected_codebase}")
+    else:
+        st.warning("No pre-indexed codebases found.")
 
 # Handle new GitHub repository input
 if option == "Provide a new GitHub repository":
@@ -174,4 +181,3 @@ if st.session_state.namespace:
             st.markdown(response)
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
-
