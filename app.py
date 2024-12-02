@@ -114,21 +114,14 @@ def perform_rag(query, namespace):
     return llm_response['choices'][0]['message']['content']
 
 # Streamlit UI
-st.title("Codebase Chat Assistant")
+st.set_page_config(page_title="Codebase Chat Assistant", page_icon="💬")
+st.title("💬 Codebase Chat Assistant")
+st.sidebar.title("Navigation")
+st.sidebar.markdown("Select an option from the sidebar")
 
-# Ensure session state for chat history and namespace
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "namespace" not in st.session_state:
-    st.session_state.namespace = None
-
-# Fetch pre-indexed namespaces dynamically from Pinecone
-index = pc.Index("codebase-rag")
-preindexed_codebases = index.describe_index_stats().get("namespaces", {})
-
-# User selects between pre-indexed or new repository
-option = st.radio("Choose how you want to interact:",
-                  ["Provide a new GitHub repository", "Select a pre-indexed codebase"])
+# Sidebar for navigation
+option = st.sidebar.radio("Choose how you want to interact:", 
+                          ["Provide a new GitHub repository", "Select a pre-indexed codebase"])
 
 # Handle namespace reset and chat clearing
 def reset_chat(namespace):
@@ -145,17 +138,18 @@ if option == "Select a pre-indexed codebase":
 
 # Handle new GitHub repository input
 if option == "Provide a new GitHub repository":
-    github_url = st.text_input("Paste a public GitHub link (indexing will take ~3 minutes):")
+    github_url = st.text_input("Paste a public GitHub link:")
     if st.button("Index and Chat") and github_url:
         st.info(f"Cloning and indexing the repository: {github_url} (this will take a few minutes)")
         try:
-            # Clone the repository
-            repo_path = clone_repository(github_url)
-            reset_chat(github_url)
+            with st.spinner("Cloning and indexing repository..."):
+                # Clone the repository
+                repo_path = clone_repository(github_url)
+                reset_chat(github_url)
 
-            # Index the codebase
-            index_codebase(repo_path, st.session_state.namespace)
-            st.success("Repository indexed successfully! You can now start chatting.")
+                # Index the codebase
+                index_codebase(repo_path, st.session_state.namespace)
+                st.success("Repository indexed successfully! You can now start chatting.")
         except Exception as e:
             st.error(f"Error indexing the repository: {e}")
 
@@ -180,3 +174,4 @@ if st.session_state.namespace:
             st.markdown(response)
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
+
