@@ -11,12 +11,13 @@ import openai
 def clone_repository(repo_url):
     """Clones a GitHub repository to a temporary directory."""
     repo_name = repo_url.split("/")[-1]  # Extract repository name from URL
-    repo_path = f"/content/{repo_name}"
+    repo_path = f"./{repo_name}"  # Use the current working directory instead of /content/
 
     # Check if the directory exists and delete it
     if os.path.exists(repo_path):
         shutil.rmtree(repo_path)  # Remove the directory and its contents
 
+    # Clone the repository into the specified path
     Repo.clone_from(repo_url, str(repo_path))
     return str(repo_path)
 
@@ -24,8 +25,7 @@ def clone_repository(repo_url):
 def index_codebase(repo_path, namespace):
     """Indexes the codebase by reading files, encoding content, and storing in Pinecone."""
     repo_files = Path(repo_path).rglob("*.*")  # Get all files in the repo
-    print("Files to be indexed:", list(repo_files))  # Debugging: Print files
-    
+
     # Initialize embeddings
     embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
     index = pc.Index("codebase-rag")
@@ -46,14 +46,14 @@ def index_codebase(repo_path, namespace):
                     "values": vector,
                     "metadata": {"text": content}
                 }], namespace=namespace)
-                print(f"Indexed file: {file_path}")  # Debugging: Show files indexed
+                print(f"Indexed file: {file_path}")
             except Exception as e:
                 print(f"Error processing file {file_path}: {e}")
 
     print(f"Codebase indexed successfully in namespace: {namespace}")
     # Debugging: Check index stats
     stats = index.describe_index_stats()
-    print("Index Stats:", stats)  # Check the index stats for the number of indexed documents
+    print("Index Stats:", stats)
 
 # Initialize Pinecone using the secrets API
 pc = Pinecone(
@@ -72,8 +72,7 @@ def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet
 # Function to perform retrieval-augmented generation
 def perform_rag(query, namespace):
     raw_query_embedding = get_huggingface_embeddings(query)
-    print("Query Embedding:", raw_query_embedding)  # Debugging: Print the query embedding
-    
+
     # Query Pinecone index
     top_matches = pc.Index("codebase-rag").query(
         vector=raw_query_embedding.tolist(),
@@ -81,9 +80,7 @@ def perform_rag(query, namespace):
         include_metadata=True,
         namespace=namespace,
     )
-    
-    print("Top Matches:", top_matches)  # Debugging: Print the top matches
-    
+
     if not top_matches["matches"]:  # Check if there are no matches
         return "No relevant information found in the codebase. The namespace may be empty, or the query may not match any content. Please ensure the repository is properly indexed."
 
