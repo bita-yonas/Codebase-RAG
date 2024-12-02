@@ -5,20 +5,20 @@ import os
 from git import Repo
 import shutil
 from pathlib import Path
+import tempfile  # Used to create temporary directories
 import openai
 
 # Function to clone a GitHub repository
 def clone_repository(repo_url):
     """Clones a GitHub repository to a temporary directory."""
-    repo_name = repo_url.split("/")[-1]  # Extract repository name from URL
-    repo_path = f"/content/{repo_name}"
+    # Use tempfile to create a temporary directory
+    with tempfile.TemporaryDirectory() as temp_dir:
+        repo_name = repo_url.split("/")[-1]  # Extract repository name from URL
+        repo_path = os.path.join(temp_dir, repo_name)  # Path to the repo in temp dir
 
-    # Check if the directory exists and delete it
-    if os.path.exists(repo_path):
-        shutil.rmtree(repo_path)  # Remove the directory and its contents
-
-    Repo.clone_from(repo_url, str(repo_path))
-    return str(repo_path)
+        # Clone the repository into the temporary directory
+        Repo.clone_from(repo_url, repo_path)
+        return repo_path  # Return the path to the cloned repository
 
 # Function to index a cloned codebase into Pinecone
 def index_codebase(repo_path, namespace):
