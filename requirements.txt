@@ -1,45 +1,20 @@
-# Base requirements
 streamlit==1.40.2
 sentence-transformers==2.2.2
+pinecone-client==5.0.1
+openai==0.28.0
+GitPython==3.1.32
+python-dotenv==1.0.1
 torch==2.5.1
 torchvision==0.20.1
-pillow==9.5.0
+huggingface-hub==0.14.1
+tokenizers==0.13.3
 numpy==1.26.4
 scikit-learn==1.5.2
 scipy==1.13.1
-transformers==4.46.2
-tokenizers==0.20.3
-pyyaml==6.0.2
-aiohttp==3.9.5
-
-# Loosen the huggingface-hub version range to avoid conflicts
-huggingface-hub>=0.4.0,<1.0.0
-
-# Fix missing dependencies
-jedi==0.18.2
-pycairo==1.24.0
-
-# Additional requirements
-openai==0.28.0
-pinecone-client==5.0.1
-python-dotenv==1.0.1
-gitpython==3.1.32
+nltk==3.9.1
 sentencepiece==0.2.0
-
-# Ensure Streamlit dependencies
-altair<6,>=4.0
-blinker<2,>=1.0.0
-cachetools<6,>=4.0
-protobuf<6,>=3.20
-pandas<3,>=1.4.0
-requests<3,>=2.27
-rich<14,>=10.14.0
-tenacity<10,>=8.1.0
-watchdog<7,>=2.1.5
-tornado<7,>=6.0.3
-pydeck<1,>=0.8.0b4
-
-# Utilities
-tqdm
-regex
-typing-extensions
+transformers==4.46.2
+aiohttp==3.9.5
+pyyaml==6.0.2
+pillow==9.5.0
+pycairo==1.24.0
