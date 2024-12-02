@@ -8,7 +8,7 @@ numpy
 scikit-learn
 scipy
 pillow
-huggingface-hub
+huggingface-hub==0.12.1
 requests
 tqdm
 torch
