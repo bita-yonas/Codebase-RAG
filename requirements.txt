@@ -12,8 +12,8 @@ tokenizers==0.20.3
 pyyaml==6.0.2
 aiohttp==3.9.5
 
-# Loosen the huggingface-hub version range to ensure compatibility
-huggingface-hub>=0.4.0,<0.15.0
+# Loosen the huggingface-hub version range to avoid conflicts
+huggingface-hub>=0.4.0,<1.0.0
 
 # Fix missing dependencies
 jedi==0.18.2
