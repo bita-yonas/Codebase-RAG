@@ -6,10 +6,6 @@ from git import Repo
 import shutil
 from pathlib import Path
 import openai
-from dotenv import load_dotenv  # Import dotenv for loading .env
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Function to clone a GitHub repository
 def clone_repository(repo_url):
@@ -58,14 +54,14 @@ def index_codebase(repo_path, namespace):
     stats = index.describe_index_stats()
     print("Index Stats:", stats)
 
-# Initialize Pinecone using the new API
+# Initialize Pinecone using the secrets API
 pc = Pinecone(
-    api_key=os.getenv("PINECONE_API_KEY"),  # Use environment variable for Pinecone API key
-    environment="us-east-1"  # Specify the correct Pinecone environment
+    api_key=st.secrets["PINECONE"]["API_KEY"],  # Use Pinecone API Key from secrets
+    environment=st.secrets["PINECONE"]["ENVIRONMENT"]  # Use Pinecone environment from secrets
 )
 
-# Set OpenAI API key from environment variable
-openai.api_key = os.getenv("GROQ_API_KEY")
+# Set OpenAI API key from secrets
+openai.api_key = st.secrets["GROQ"]["API_KEY"]  # Use Groq API key from secrets
 
 # Function to get Hugging Face embeddings
 def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet-base-v2"):
