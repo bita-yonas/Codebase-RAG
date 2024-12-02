@@ -115,11 +115,20 @@ def perform_rag(query, namespace):
 
 # Streamlit UI
 st.set_page_config(page_title="Codebase Chat Assistant", page_icon="💬")
-st.title("💬 Codebase Chat Assistant")
-st.sidebar.title("Navigation")
-st.sidebar.markdown("Select an option from the sidebar")
 
-# Sidebar for navigation
+# Ensure session state for chat history and namespace
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Initialize 'namespace' if not already present in session state
+if "namespace" not in st.session_state:
+    st.session_state.namespace = None
+
+# Streamlit Sidebar for navigation
+st.sidebar.title("Codebase Chat Assistant")
+st.sidebar.markdown("### Choose an option below:")
+
+# User selects between pre-indexed or new repository
 option = st.sidebar.radio("Choose how you want to interact:", 
                           ["Provide a new GitHub repository", "Select a pre-indexed codebase"])
 
