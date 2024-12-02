@@ -11,5 +11,5 @@ pillow==9.5.0
 huggingface-hub==0.16.4
 requests==2.32.3
 tqdm==4.66.6
-torch==2.5.1+cu121  # Update CUDA version if needed
-torchvision==0.20.1+cu121
+torch==2.4.1
+torchvision==0.20.1
