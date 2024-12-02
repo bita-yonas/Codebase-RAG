@@ -100,7 +100,6 @@ def perform_rag(query, namespace):
     "If relevant, provide examples or suggestions to improve code quality or resolve potential issues."
     )
 
-
     llm_response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",  # specify the model you want to use
         messages=[
