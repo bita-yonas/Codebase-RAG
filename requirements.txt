@@ -4,3 +4,6 @@ pinecone-client==5.0.1
 python-dotenv==1.0.0
 openai==0.28.0
 gitpython==3.1.32
+torch==2.5.1  # Or the appropriate version
+torchvision==0.20.1
+transformers==4.46.2
