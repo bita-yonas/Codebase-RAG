@@ -1,14 +1,11 @@
 import streamlit as st
-import pandas as pd
-import pickle
-import numpy as np
-import os
-import requests  # Using requests to call Groq API
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone
+import os
 from git import Repo
 import shutil
 from pathlib import Path
+import openai
 
 # Function to clone a GitHub repository
 def clone_repository(repo_url):
@@ -63,15 +60,15 @@ pc = Pinecone(
     environment=st.secrets["PINECONE"]["ENVIRONMENT"]  # Use Pinecone environment from secrets
 )
 
-# Groq API setup
-groq_api_key = st.secrets["GROQ"]["API_KEY"]  # Use Groq API key from secrets
+# Set OpenAI API key from secrets
+openai.api_key = st.secrets["GROQ"]["API_KEY"]  # Use Groq API key from secrets
 
 # Function to get Hugging Face embeddings
 def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet-base-v2"):
     model = SentenceTransformer(model_name)
     return model.encode(text)
 
-# Function to perform retrieval-augmented generation with Groq API
+# Function to perform retrieval-augmented generation
 def perform_rag(query, namespace):
     raw_query_embedding = get_huggingface_embeddings(query)
 
@@ -103,27 +100,17 @@ def perform_rag(query, namespace):
     "If relevant, provide examples or suggestions to improve code quality or resolve potential issues."
     )
 
-    # Sending the request to the Groq API for completion
-    headers = {
-        "Authorization": f"Bearer {groq_api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "model": "gpt-3.5-turbo",  # Specify the model you are using
-        "messages": [
+    # Make the API call to the correct Groq chat endpoint
+    llm_response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # specify the model you want to use
+        messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": augmented_query},
-        ]
-    }
+        ],
+        api_base="https://api.groq.com/openai/v1"  # Correct API endpoint
+    )
 
-    response = requests.post("https://api.groq.com/openai/v1/completions", json=data, headers=headers)
-
-    if response.status_code == 200:
-        result = response.json()
-        return result['choices'][0]['message']['content']
-    else:
-        return f"Error: {response.status_code}, {response.text}"
+    return llm_response['choices'][0]['message']['content']
 
 # Streamlit UI
 st.title("Codebase Chat Assistant")
